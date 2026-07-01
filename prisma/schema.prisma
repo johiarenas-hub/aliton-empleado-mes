@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Empleado {
+  id        String   @id @default(cuid())
+  nombre    String
+  cargo     String?
+  area      String?
+  telefono  String
+  activo    Boolean  @default(true)
+
+  codigos              Codigo[]
+  calificacionesRecibidas Calificacion[]  @relation("evaluado")
+  votosEmitidos        ControlVoto[]     @relation("evaluador")
+  votosRecibidos       ControlVoto[]     @relation("evaluadoControl")
+}
+
+model Ronda {
+  id           String   @id @default(cuid())
+  mes          Int
+  anio         Int
+  fechaInicio  DateTime @default(now())
+  fechaCierre  DateTime
+  estado       String   @default("abierta") // abierta | cerrada
+
+  codigos        Codigo[]
+  calificaciones Calificacion[]
+  controlVotos   ControlVoto[]
+}
+
+model Codigo {
+  id         String   @id @default(cuid())
+  codigo     String   @unique
+  empleadoId String
+  empleado   Empleado @relation(fields: [empleadoId], references: [id])
+  rondaId    String
+  ronda      Ronda    @relation(fields: [rondaId], references: [id])
+  creadoEn   DateTime @default(now())
+  expiraEn   DateTime
+}
+
+model Criterio {
+  id     String  @id @default(cuid())
+  nombre String
+  peso   Int     @default(1)
+  activo Boolean @default(true)
+
+  calificaciones Calificacion[]
+}
+
+model Calificacion {
+  id         String   @id @default(cuid())
+  rondaId    String
+  ronda      Ronda    @relation(fields: [rondaId], references: [id])
+  evaluadoId String
+  evaluado   Empleado @relation("evaluado", fields: [evaluadoId], references: [id])
+  criterioId String
+  criterio   Criterio @relation(fields: [criterioId], references: [id])
+  puntaje    Int
+  creadoEn   DateTime @default(now())
+}
+
+model ControlVoto {
+  id          String   @id @default(cuid())
+  rondaId     String
+  ronda       Ronda    @relation(fields: [rondaId], references: [id])
+  evaluadorId String
+  evaluador   Empleado @relation("evaluador", fields: [evaluadorId], references: [id])
+  evaluadoId  String
+  evaluado    Empleado @relation("evaluadoControl", fields: [evaluadoId], references: [id])
+  votadoEn    DateTime @default(now())
+
+  @@unique([rondaId, evaluadorId, evaluadoId])
+}
