@@ -1,5 +1,6 @@
+import { prisma } from "../../../../lib/prisma";
+
 export const dynamic = "force-dynamic";
-const { prisma } = require("../../../../lib/prisma");
 
 async function validarCodigo(codigoTexto) {
   const codigo = await prisma.codigo.findUnique({
@@ -12,7 +13,7 @@ async function validarCodigo(codigoTexto) {
   return { codigo };
 }
 
-async function GET(_req, { params }) {
+export async function GET(_req, { params }) {
   const resultado = await validarCodigo(params.codigo);
   if (resultado.error) return Response.json({ error: resultado.error }, { status: resultado.status });
 
@@ -39,7 +40,7 @@ async function GET(_req, { params }) {
   });
 }
 
-async function POST(req, { params }) {
+export async function POST(req, { params }) {
   const resultado = await validarCodigo(params.codigo);
   if (resultado.error) return Response.json({ error: resultado.error }, { status: resultado.status });
 
@@ -90,5 +91,3 @@ async function POST(req, { params }) {
 
   return Response.json({ ok: true });
 }
-
-module.exports = { GET, POST };

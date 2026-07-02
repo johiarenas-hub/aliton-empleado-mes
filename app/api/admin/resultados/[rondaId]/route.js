@@ -1,9 +1,10 @@
+import { prisma } from "../../../../../lib/prisma";
+
 export const dynamic = "force-dynamic";
-const { prisma } = require("../../../../../lib/prisma");
 
 const MINIMO_VOTOS = 3;
 
-async function GET(_req, { params }) {
+export async function GET(_req, { params }) {
   const ronda = await prisma.ronda.findUnique({ where: { id: params.rondaId } });
   if (!ronda) return Response.json({ error: "Ronda no encontrada." }, { status: 404 });
 
@@ -44,5 +45,3 @@ async function GET(_req, { params }) {
 
   return Response.json({ ronda, tabla, ganador, minimoVotos: MINIMO_VOTOS });
 }
-
-module.exports = { GET };

@@ -1,13 +1,13 @@
-export const dynamic = "force-dynamic";
-const { prisma } = require("../../../../lib/prisma");
-const { generarCodigo, armarLinkWhatsapp, armarMensajeCodigo } = require("../../../../lib/codigo");
+import { prisma } from "../../../../lib/prisma";
+import { generarCodigo, armarLinkWhatsapp, armarMensajeCodigo } from "../../../../lib/codigo";
 
-async function POST(req) {
+export const dynamic = "force-dynamic";
+
+export async function POST(req) {
   const body = await req.json().catch(() => ({}));
   const diasDuracion = body.diasDuracion || 25;
   const urlBase = body.urlBase || process.env.APP_URL || "http://localhost:3000";
 
-  // Cierra cualquier ronda que siga abierta
   await prisma.ronda.updateMany({ where: { estado: "abierta" }, data: { estado: "cerrada" } });
 
   const ahora = new Date();
@@ -49,9 +49,7 @@ async function POST(req) {
   return Response.json({ ronda, enlaces });
 }
 
-async function GET() {
+export async function GET() {
   const ronda = await prisma.ronda.findFirst({ where: { estado: "abierta" }, orderBy: { fechaInicio: "desc" } });
   return Response.json({ ronda });
 }
-
-module.exports = { POST, GET };
