@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 const { prisma } = require("../../../../lib/prisma");
 const { generarCodigo, armarLinkWhatsapp, armarMensajeCodigo } = require("../../../../lib/codigo");
 
